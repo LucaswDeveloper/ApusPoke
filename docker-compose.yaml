@@ -1,0 +1,53 @@
+version: '3.3'
+
+services:
+  app:    
+    build:
+      context: .
+      dockerfile: .docker/dev.Dockerfile # Ajuste para o caminho correto do Dockerfile
+    container_name: apuspoke-app
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www:delegated
+    networks:
+      - service-network
+
+  apuspoke-nginx:
+    image: nginx:alpine
+    container_name: apuspoke-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80" # O Nginx estará acessível na porta 80 do host
+    volumes:
+      - ./:/var/www:delegated
+      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf # Ajuste para o caminho correto do arquivo de configuração do Nginx
+    networks:
+      - service-network
+    depends_on:
+      - app
+
+  apuspoke-mysql:
+    image: mysql:5.7
+    container_name: apuspoke-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306" # Ajuste se necessário para a porta desejada no host
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - service-network
+    env_file:
+      - .env # Ajuste se você estiver usando um arquivo .env diferente
+
+networks:
+  service-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
