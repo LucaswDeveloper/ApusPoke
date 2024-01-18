@@ -52,9 +52,9 @@ docker exec -it apuspoke-app php artisan key:generate
 docker exec -it apuspoke-app php artisan migrate
 ```
 
-## Configuração do Laravel no Container
-O projeto estará acessível via http://localhost
 **Links uteis**
+O projeto estará acessível via http://localhost
+
 - http://localhost/register
 - http://localhost/login
 - http://localhost/search
